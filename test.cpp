@@ -8,12 +8,7 @@ using namespace std;
 
 void solve()
 {
-    int a, b;
-    cin >> a >> b;
-    int x = (b + 5) / 6;
-    if (a > b) cout << "No" << endl;
-    else if (a >= x) cout << "Yes" << endl;
-    else cout << "No" << endl;
+    cout << " test" << endl;
 
 }
 
