@@ -82,3 +82,38 @@ int main(){
     shortest_path(f, s);
 }
 
+/*Some common concepts,
+to check number of connected components:
+->run a dfs for every i, if the ith node is not visited, increase count by 1
+
+to check whether there is a cycle or not:
+->run a dfs where parameters are (node, parent)
+->if there is node in the adjacency list for some i, which is not visited
+  run a dfs(this node, parent node)
+->else if (current node != parent node of prev node) return true;
+code:
+int dfscycle(int v, int p){
+    visited[v] = 1;
+    for(int i : lis[v]){
+        if (visited[i] == 0){
+            if(dfscycle(i, v)) return 1;
+        }
+        else if (i != p) return 1;
+    }
+    return 0;
+}
+
+to find longest path in an acyclic undirected graph:
+-> run a dfs to find the farthest element from an arbitrary node
+-> run another dfs with the farthest element as root
+code:
+void dfs(int v, int p){
+    visited[v] = 1;
+    for(int i : lis[v]){
+        if(i != p){
+            length[i] = length[v] + 1;
+            dfs(i, v);
+        }
+    }
+}
+*/
