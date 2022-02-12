@@ -1,114 +1,166 @@
 #include "bits/stdc++.h"
 using namespace std;
-#define int long long 
+#define int long long
 #define endl "\n"
+#define sz(x) (int)(x).size()
+#define all(x) x.begin(), x.end()
 
-class Logbook{
-    private:
-        int logMonth;
-        int logYear;
-        int daysInMonth;
-        vector<int> entries;
-        bool isLeapYear(int year);
-    
-    public:
-        Logbook(int month, int year);
-        void putEntry(int day, int value);
-        int getEntry(int day);
-        int getMonth();
-        int getYear();
-        int getDaysInMonth();
-        bool hasTargetBeenReached(int target);
-        int longestConsecutiveSubsequence();
+template<typename DataType>
+class List{
+        private:
+                int length;
+                int cursorPosition;
+                int numberOfElements;
+                vector<DataType> array;
+
+        public:
+                List(int listSize);
+                void insert(const DataType &newDataItem);
+                void remove();
+                void replace(const DataType &newDataItem);
+                void clear();
+                bool isEmpty();
+                bool isFull();
+                void gotoBeginning();
+                void gotoEnd();
+                bool gotoNext();
+                bool gotoPrior();
+                DataType getCursor();
+                void showStructure();
 };
 
-bool Logbook :: isLeapYear(int year){
-    if (year % 4 == 0){
-        if (year % 100 == 0){
-            if (year % 400 == 0){
+template<typename DataType>
+List<DataType> :: List(int listSize){
+        array.resize(listSize);
+        length = listSize;
+        cursorPosition = -1;
+        numberOfElements = 0;
+}
+
+template<typename DataType>
+void List<DataType> :: insert(const DataType &newDataItem){
+        for(int i = numberOfElements - 1; i > cursorPosition; i--) array[i + 1] = array[i];
+        array[cursorPosition + 1] = newDataItem;
+        cursorPosition++;
+        numberOfElements++;
+}
+
+template<typename DataType>
+void List<DataType> :: remove(){
+        for(int i = cursorPosition; i < numberOfElements - 1; i++) array[i] = array[i  +1];
+        if (cursorPosition == numberOfElements - 1) cursorPosition--;
+        //else cursorPosition++;
+        numberOfElements--;
+}
+
+template<typename DataType>
+void List<DataType> :: replace(const DataType &newDataItem){
+        array[cursorPosition] = newDataItem;
+}
+
+template<typename DataType>
+void List<DataType> :: clear(){
+        array.clear();
+        array.resize(length);
+}
+
+template<typename DataType>
+bool List<DataType> :: isEmpty(){
+        return numberOfElements == 0;
+}
+
+template<typename DataType>
+bool List<DataType> :: isFull(){
+        return numberOfElements == length;
+}
+
+template<typename DataType>
+void List<DataType> :: gotoBeginning(){
+        cursorPosition = 0;
+}
+
+template<typename DataType>
+void List<DataType> :: gotoEnd(){
+        cursorPosition = numberOfElements - 1;
+}
+
+template<typename DataType>
+bool List<DataType> :: gotoNext(){
+        if (cursorPosition == numberOfElements - 1) return false;
+        else{
+                cursorPosition++;
                 return true;
-            }
-            else return false;
         }
-        else return false;
-    }
-    else return false;
 }
 
-Logbook :: Logbook(int month, int year){
-    logMonth = month;
-    logYear = year;
-
-    vector<int> daysList = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-    if (month == 2 && isLeapYear(logYear) == true) daysInMonth = 29;
-    else daysInMonth = daysList[logMonth - 1];
-    
-    entries.resize(daysInMonth, 0);    
-}
-
-void Logbook :: putEntry(int day, int value){
-        entries[day - 1] = value;
-}
-
-int Logbook :: getEntry(int day){
-    return entries[day];
-}
-
-int Logbook :: getMonth(){
-    return logMonth;
-}
-
-int Logbook :: getYear(){
-    return logYear;
-}
-
-int Logbook :: getDaysInMonth(){
-    return daysInMonth;
-}
-
-bool Logbook :: hasTargetBeenReached(int target){
-    int sum = 0;
-    for(int i = 0; i < daysInMonth; i++) sum += entries[i];
-    if (sum >= target) return true;
-    else false;
-}
-
-int Logbook :: longestConsecutiveSubsequence(){
-    sort(entries.begin(), entries.end());
-    vector<int> length;
-    int ch = 1;
-    for(int i = 0; i < daysInMonth; i++){
-        if (entries[i] == 0) ch = 0;
-    }
-    if (ch){
-        int l = 1;
-        for(int i = 1; i < daysInMonth; i++){
-            if (entries[i] == entries[i - 1] + 1) l++;
-            else{
-                length.push_back(l);
-                l = 1;
-            }
+template<typename DataType>
+bool List<DataType> :: gotoPrior(){
+        if (cursorPosition == 0) return false;
+        else{
+                cursorPosition--;
+                return true;
         }
-        length.push_back(l);
-        sort(length.begin(), length.end());
-        return length[(int)length.size() - 1];
-    }
-    else return 0;
+}
+
+template<typename DataType>
+DataType List<DataType> :: getCursor(){
+        return array[cursorPosition];
+}
+
+template<typename DataType>
+void List<DataType> :: showStructure(){
+        if (numberOfElements == 0){
+                cout << "Empty List" << endl;
+                return;
+        }
+        else{
+                cout << "The number of elements in the list is " << numberOfElements << endl;
+                for(int i = 0; i < numberOfElements; i++) cout << array[i] << endl;
+        }
+}
+
+template<typename DataType>
+vector<DataType> merge(List<DataType> l1, List<DataType> l2){
+        vector<DataType> ans;
+        l1.gotoBeginning();
+        l2.gotoBeginning();
+        ans.push_back(l1.getCursor());
+        while(l1.gotoNext()){
+                ans.push_back(l1.getCursor());
+        }
+        ans.push_back(l2.getCursor());
+        while(l2.gotoNext()){
+                ans.push_back(l2.getCursor());
+        }
+        sort(all(ans));
+        return ans;
+}
+
+void solve(){
+        List<string> l1(5);
+        List<string> l2(3);
+        l1.insert("aay");
+        l1.insert("aaz");
+        l1.insert("abx");
+        l1.insert("aby");
+        l1.insert("abz");
+
+        l2.insert("aax");
+        l2.insert("aazz");
+        l2.insert("az");
+
+        vector<string> ans = merge(l1, l2);
+        for(int i = 0; i < sz(ans); i++) cout << ans[i] << endl;
 }
 
 int32_t main()
 {
-    Logbook testLogbook(2, 2020);
-    for(int i = 1;i <= 29;i += 4) testLogbook.putEntry(i, i+5);
-
-    if (testLogbook.hasTargetBeenReached(160)) cout<< "YES" << endl;
-    if (testLogbook.hasTargetBeenReached(120)) cout<< "NO" << endl;
-
-    for(int i=1;i<=29;i++){
-        if(i % 2 == 0) testLogbook.putEntry(i, i / 2);
-        else testLogbook.putEntry(i, i + 100);
-    }
-    cout << testLogbook.longestConsecutiveSubsequence() << endl;
-    return 0;
+        ios_base::sync_with_stdio(false);
+        cin.tie(nullptr);
+        cout.tie(nullptr);
+        int t = 1;
+        //cin >> t;
+        while (t--)
+                solve();
+        return 0;
 }
