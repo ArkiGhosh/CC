@@ -12,6 +12,7 @@ class List{
                 int cursorPosition;
                 int numberOfElements;
                 vector<DataType> array;
+                vector<int> prefixsum;
 
         public:
                 List(int listSize);
@@ -27,6 +28,8 @@ class List{
                 bool gotoPrior();
                 DataType getCursor();
                 void showStructure();
+                void createPrefixSumArray();
+                int subArraySum(int left, int right);
 };
 
 template<typename DataType>
@@ -120,6 +123,20 @@ void List<DataType> :: showStructure(){
 }
 
 template<typename DataType>
+void List<DataType> :: createPrefixSumArray(){
+       prefixsum.assign(length, 0);
+       prefixsum[0] = array[0];
+       for(int i = 1; i < length; i++){
+               prefixsum[i] += prefixsum[i - 1] + array[i];
+       }
+}
+
+template<typename DataType>
+int List<DataType> :: subArraySum(int left, int right){
+        return prefixsum[right] - prefixsum[left - 1ll];
+}
+
+template<typename DataType>
 vector<DataType> merge(List<DataType> l1, List<DataType> l2){
         vector<DataType> ans;
         l1.gotoBeginning();
@@ -136,21 +153,20 @@ vector<DataType> merge(List<DataType> l1, List<DataType> l2){
         return ans;
 }
 
+
 void solve(){
-        List<string> l1(5);
-        List<string> l2(3);
-        l1.insert("aay");
-        l1.insert("aaz");
-        l1.insert("abx");
-        l1.insert("aby");
-        l1.insert("abz");
-
-        l2.insert("aax");
-        l2.insert("aazz");
-        l2.insert("az");
-
-        vector<string> ans = merge(l1, l2);
-        for(int i = 0; i < sz(ans); i++) cout << ans[i] << endl;
+        List<int> tempList(5);
+        tempList.insert(6);
+        tempList.insert(1);
+        tempList.insert(4);
+        tempList.insert(8);
+        tempList.insert(3);
+        tempList.createPrefixSumArray();
+        cout<<tempList.subArraySum(1, 3) << endl;
+        cout<<tempList.subArraySum(1, 5) << endl;
+        cout<<tempList.subArraySum(4, 5) << endl;
+        cout<<tempList.subArraySum(1, 1) << endl;
+        cout<<tempList.subArraySum(2, 4) << endl;
 }
 
 int32_t main()
