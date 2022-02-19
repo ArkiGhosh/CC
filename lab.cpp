@@ -1,3 +1,5 @@
+//Code by Arkishman Ghosh
+
 #include "bits/stdc++.h"
 using namespace std;
 #define int long long
@@ -5,168 +7,423 @@ using namespace std;
 #define sz(x) (int)(x).size()
 #define all(x) x.begin(), x.end()
 
-template<typename DataType>
-class List{
-        private:
-                int length;
-                int cursorPosition;
-                int numberOfElements;
-                vector<DataType> array;
-                vector<int> prefixsum;
+template <typename DT>
+class SinglyLinkedNode
+{
+public:
+        DT dataItem;
+        SinglyLinkedNode<DT> *next;
 
-        public:
-                List(int listSize);
-                void insert(const DataType &newDataItem);
-                void remove();
-                void replace(const DataType &newDataItem);
-                void clear();
-                bool isEmpty();
-                bool isFull();
-                void gotoBeginning();
-                void gotoEnd();
-                bool gotoNext();
-                bool gotoPrior();
-                DataType getCursor();
-                void showStructure();
-                void createPrefixSumArray();
-                int subArraySum(int left, int right);
+        SinglyLinkedNode(DT nodeValue, SinglyLinkedNode<DT> *nextPointer);
 };
 
-template<typename DataType>
-List<DataType> :: List(int listSize){
-        array.resize(listSize);
-        length = listSize;
-        cursorPosition = -1;
-        numberOfElements = 0;
+template <typename DT>
+SinglyLinkedNode<DT>::SinglyLinkedNode(DT nodeValue, SinglyLinkedNode *nextPointer)
+{
+        dataItem = nodeValue;
+        next = nextPointer;
 }
 
-template<typename DataType>
-void List<DataType> :: insert(const DataType &newDataItem){
-        for(int i = numberOfElements - 1; i > cursorPosition; i--) array[i + 1] = array[i];
-        array[cursorPosition + 1] = newDataItem;
-        cursorPosition++;
-        numberOfElements++;
+template <typename DT>
+class SinglyLinkedList
+{
+        // We declare these members protected because we will inherit this class later
+protected:
+        // Data Members
+        SinglyLinkedNode<DT> *head;
+        SinglyLinkedNode<DT> *cursor;
+        int numberOfItems;
+
+public:
+        // Constructor
+        SinglyLinkedList();
+
+        void insert(const DT &newDataItem);
+        void remove();
+        void replace(const DT &newDataItem);
+        void clear();
+        bool isEmpty();
+        void gotoBeginning();
+        void gotoEnd();
+        bool gotoNext();
+        bool gotoPrior();
+        DT getCursor();
+        void showStructure();
+};
+
+template <typename DT>
+SinglyLinkedList<DT>::SinglyLinkedList()
+{
+        head = NULL;
+        cursor = NULL;
+        numberOfItems = 0;
 }
 
-template<typename DataType>
-void List<DataType> :: remove(){
-        for(int i = cursorPosition; i < numberOfElements - 1; i++) array[i] = array[i  +1];
-        if (cursorPosition == numberOfElements - 1) cursorPosition--;
-        //else cursorPosition++;
-        numberOfElements--;
-}
+template <typename DT>
+void SinglyLinkedList<DT>::insert(const DT &newDataItem)
+{
+        if (numberOfItems == 0)
+        {
+                head = new SinglyLinkedNode<DT>(newDataItem, NULL);
 
-template<typename DataType>
-void List<DataType> :: replace(const DataType &newDataItem){
-        array[cursorPosition] = newDataItem;
-}
-
-template<typename DataType>
-void List<DataType> :: clear(){
-        array.clear();
-        array.resize(length);
-}
-
-template<typename DataType>
-bool List<DataType> :: isEmpty(){
-        return numberOfElements == 0;
-}
-
-template<typename DataType>
-bool List<DataType> :: isFull(){
-        return numberOfElements == length;
-}
-
-template<typename DataType>
-void List<DataType> :: gotoBeginning(){
-        cursorPosition = 0;
-}
-
-template<typename DataType>
-void List<DataType> :: gotoEnd(){
-        cursorPosition = numberOfElements - 1;
-}
-
-template<typename DataType>
-bool List<DataType> :: gotoNext(){
-        if (cursorPosition == numberOfElements - 1) return false;
-        else{
-                cursorPosition++;
-                return true;
+                cursor = head;
         }
-}
 
-template<typename DataType>
-bool List<DataType> :: gotoPrior(){
-        if (cursorPosition == 0) return false;
-        else{
-                cursorPosition--;
-                return true;
+        else
+        {
+                SinglyLinkedNode<DT> *new_node = new SinglyLinkedNode<DT>(newDataItem, cursor->next);
+                cursor->next = new_node;
+                cursor = cursor->next;
         }
+        numberOfItems++;
 }
-
-template<typename DataType>
-DataType List<DataType> :: getCursor(){
-        return array[cursorPosition];
-}
-
-template<typename DataType>
-void List<DataType> :: showStructure(){
-        if (numberOfElements == 0){
-                cout << "Empty List" << endl;
+template <typename DT>
+void SinglyLinkedList<DT>::remove()
+{
+        if (cursor == head)
+        {
+                head = head->next;
+                delete cursor;
+                cursor = head;
+                numberOfItems--;
                 return;
         }
-        else{
-                cout << "The number of elements in the list is " << numberOfElements << endl;
-                for(int i = 0; i < numberOfElements; i++) cout << array[i] << endl;
+
+        SinglyLinkedNode<DT> *prev_node = head;
+        while (prev_node->next != cursor)
+        {
+                prev_node = prev_node->next;
+        }
+
+        if (cursor->next == NULL)
+        {
+                prev_node->next = NULL;
+                delete cursor;
+                cursor = head;
+        }
+
+        else
+        {
+                prev_node->next = cursor->next;
+                delete cursor;
+                cursor = prev_node->next;
+        }
+
+        numberOfItems--;
+}
+
+template <typename DT>
+void SinglyLinkedList<DT>::replace(const DT &newDataItem)
+{
+        cursor->dataItem = newDataItem;
+}
+
+template <typename DT>
+void SinglyLinkedList<DT>::clear()
+{
+
+        cursor = head;
+        while (cursor->next != NULL)
+        {
+                SinglyLinkedNode<DT> *nextNode = cursor->next;
+                delete cursor;
+                cursor = nextNode;
+        }
+
+        numberOfItems = 0;
+        head = NULL;
+        cursor = NULL;
+}
+
+template <typename DT>
+bool SinglyLinkedList<DT>::isEmpty()
+{
+        return numberOfItems == 0;
+}
+
+template <typename DT>
+void SinglyLinkedList<DT>::gotoBeginning()
+{
+        cursor = head;
+}
+
+template <typename DT>
+void SinglyLinkedList<DT>::gotoEnd()
+{
+        while (cursor->next != NULL)
+                cursor = cursor->next;
+}
+
+template <typename DT>
+bool SinglyLinkedList<DT>::gotoNext()
+{
+        if (cursor->next == NULL)
+                return false;
+        else
+        {
+                cursor = cursor->next;
+                return true;
         }
 }
 
-template<typename DataType>
-void List<DataType> :: createPrefixSumArray(){
-       prefixsum.assign(length, 0);
-       prefixsum[0] = array[0];
-       for(int i = 1; i < length; i++){
-               prefixsum[i] += prefixsum[i - 1] + array[i];
-       }
-}
-
-template<typename DataType>
-int List<DataType> :: subArraySum(int left, int right){
-        return prefixsum[right] - prefixsum[left - 1ll];
-}
-
-template<typename DataType>
-vector<DataType> merge(List<DataType> l1, List<DataType> l2){
-        vector<DataType> ans;
-        l1.gotoBeginning();
-        l2.gotoBeginning();
-        ans.push_back(l1.getCursor());
-        while(l1.gotoNext()){
-                ans.push_back(l1.getCursor());
+template <typename DT>
+bool SinglyLinkedList<DT>::gotoPrior()
+{
+        if (cursor == head)
+                return false;
+        else
+        {
+                SinglyLinkedNode<DT> *prev_node = head;
+                while (prev_node->next != cursor)
+                        prev_node = prev_node->next;
+                cursor = prev_node;
+                return true;
         }
-        ans.push_back(l2.getCursor());
-        while(l2.gotoNext()){
-                ans.push_back(l2.getCursor());
-        }
-        sort(all(ans));
-        return ans;
 }
 
+template <typename DT>
+DT SinglyLinkedList<DT>::getCursor()
+{
+        return cursor->dataItem;
+}
 
-void solve(){
-        List<int> tempList(5);
-        tempList.insert(6);
-        tempList.insert(1);
-        tempList.insert(4);
-        tempList.insert(8);
-        tempList.insert(3);
-        tempList.createPrefixSumArray();
-        cout<<tempList.subArraySum(1, 3) << endl;
-        cout<<tempList.subArraySum(1, 5) << endl;
-        cout<<tempList.subArraySum(4, 5) << endl;
-        cout<<tempList.subArraySum(1, 1) << endl;
-        cout<<tempList.subArraySum(2, 4) << endl;
+template <typename DT>
+void SinglyLinkedList<DT>::showStructure()
+{
+        if (numberOfItems == 0)
+        {
+                cout << "Empty list" << endl;
+                return;
+        }
+
+        SinglyLinkedNode<DT> *temp_node = head;
+        while (temp_node != NULL)
+        {
+                cout << temp_node->dataItem << " ";
+                temp_node = temp_node->next;
+        }
+        cout << endl;
+}
+
+template <typename DT>
+class DoublyLinkedNode : public SinglyLinkedNode<DT>
+{
+public:
+        DoublyLinkedNode<DT> *next;
+        DoublyLinkedNode<DT> *prev;
+        using SinglyLinkedNode<DT>::dataItem;
+
+        DoublyLinkedNode(DT nodeValue, DoublyLinkedNode<DT> *nextPointer, DoublyLinkedNode<DT> *prevPointer);
+};
+
+template <typename DT>
+DoublyLinkedNode<DT>::DoublyLinkedNode(DT nodeValue, DoublyLinkedNode *nextPointer, DoublyLinkedNode *prevPointer) : SinglyLinkedNode<DT>(nodeValue, nextPointer)
+{
+        dataItem = nodeValue;
+        next = nextPointer;
+        prev = prevPointer;
+}
+
+template <typename DT>
+class DoublyLinkedList : public SinglyLinkedList<DT>
+{
+public:
+        DoublyLinkedNode<DT> *head;
+        DoublyLinkedNode<DT> *cursor;
+        using SinglyLinkedList<DT>::numberOfItems;
+        DoublyLinkedList();
+        void insert(const DT &newDataItem);
+        DT getCursor();
+        bool isEmpty();
+        void clear();
+        void remove();
+        void replace(const DT &newDataItem);
+        bool gotoPrior();
+        void showStructure();
+        void gotoBeginning();
+        void gotoEnd();
+        bool gotoNext();
+};
+
+template <typename DT>
+DoublyLinkedList<DT>::DoublyLinkedList()
+{
+        head = NULL;
+        cursor = NULL;
+        numberOfItems = 0;
+}
+
+template <typename DT>
+void DoublyLinkedList<DT>::insert(const DT &newDataItem)
+{
+        if (numberOfItems == 0)
+        {
+                head = new DoublyLinkedNode<DT>(newDataItem, NULL, NULL);
+                cursor = head;
+        }
+
+        else
+        {
+                DoublyLinkedNode<DT> *new_node = new DoublyLinkedNode<DT>(newDataItem, cursor->next, cursor);
+                cursor->next = new_node;
+                cursor = cursor->next;
+        }
+        numberOfItems++;
+}
+
+template <typename DT>
+DT DoublyLinkedList<DT>::getCursor()
+{
+        return cursor->dataItem;
+}
+
+template <typename DT>
+bool DoublyLinkedList<DT>::isEmpty()
+{
+        return numberOfItems == 0;
+}
+
+template <typename DT>
+void DoublyLinkedList<DT>::clear()
+{
+
+        cursor = head;
+        while (cursor->next != NULL)
+        {
+                DoublyLinkedNode<DT> *nextNode = cursor->next;
+                delete cursor;
+                cursor = nextNode;
+        }
+
+        numberOfItems = 0;
+        head = NULL;
+        cursor = NULL;
+}
+
+template <typename DT>
+void DoublyLinkedList<DT>::remove()
+{
+        if (cursor == head)
+        {
+                head = head->next;
+                delete cursor;
+                cursor = head;
+                numberOfItems--;
+                return;
+        }
+
+        DoublyLinkedNode<DT> *prev_node = head;
+        while (prev_node->next != cursor)
+        {
+                prev_node = prev_node->next;
+        }
+
+        if (cursor->next == NULL)
+        {
+                prev_node->next = NULL;
+                delete cursor;
+                cursor = head;
+        }
+
+        else
+        {
+                prev_node->next = cursor->next;
+                delete cursor;
+                cursor = prev_node->next;
+        }
+
+        numberOfItems--;
+}
+
+template <typename DT>
+void DoublyLinkedList<DT>::replace(const DT &newDataItem)
+{
+        cursor->dataItem = newDataItem;
+}
+
+template <typename DT>
+bool DoublyLinkedList<DT>::gotoPrior()
+{
+        if (cursor->prev == NULL)
+                return false;
+        else
+        {
+                cursor = cursor->prev;
+                return true;
+        }
+}
+
+template <typename DT>
+void DoublyLinkedList<DT>::showStructure()
+{
+        if (numberOfItems == 0)
+        {
+                cout << "Empty list" << endl;
+                return;
+        }
+
+        DoublyLinkedNode<DT> *temp_node = head;
+        while (temp_node != NULL)
+        {
+                cout << temp_node->dataItem << " ";
+                temp_node = temp_node->next;
+        }
+        cout << endl;
+}
+
+template <typename DT>
+void DoublyLinkedList<DT>::gotoBeginning()
+{
+        cursor = head;
+}
+
+template <typename DT>
+void DoublyLinkedList<DT>::gotoEnd()
+{
+        while (cursor->next != NULL)
+                cursor = cursor->next;
+}
+
+template <typename DT>
+bool DoublyLinkedList<DT>::gotoNext()
+{
+        if (cursor->next == NULL)
+                return false;
+        else
+        {
+                cursor = cursor->next;
+                return true;
+        }
+}
+
+void solve()
+{
+        DoublyLinkedList<int> list;
+        list.insert(1);
+        list.insert(2);
+        list.insert(3);
+        list.insert(4);
+        list.insert(5);
+        list.insert(6);
+        list.showStructure();
+        list.remove();
+        list.gotoNext();
+        list.gotoNext();
+        list.showStructure();
+        list.replace(10);
+        list.showStructure();
+        list.gotoBeginning();
+        cout << list.getCursor() << endl;
+        list.gotoEnd();
+        cout << list.getCursor() << endl;
+        list.gotoPrior();
+        list.gotoPrior();
+        cout << list.getCursor() << endl;
+        list.gotoNext();
+        cout << list.getCursor() << endl;
+        list.clear();
+        if (list.isEmpty())
+                cout << "List is empty\n";
 }
 
 int32_t main()
@@ -175,7 +432,7 @@ int32_t main()
         cin.tie(nullptr);
         cout.tie(nullptr);
         int t = 1;
-        //cin >> t;
+        // cin >> t;
         while (t--)
                 solve();
         return 0;
