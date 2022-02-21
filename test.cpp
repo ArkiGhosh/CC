@@ -6,38 +6,29 @@ using namespace std;
 #define all(x) x.begin(), x.end()
 #define len(x) (int)(x).length()
 int N = 1e9 + 7;
+int k;
+vector<string> ans;
 
-vector<vector<int>> lis;
-vector<int> visited, height;
-int n, m;
-
-void dfs(int v){
-        visited[v] = 1;
-        for(auto i : lis[v]){
-                if (visited[i]){
-                        height[v] = max(height[v], height[i] + 1);
-                        continue;
-                }
-                dfs(i);
-                height[v] = max(height[v], height[i] + 1);
+void func(string s){
+        if(sz(s) == k){
+                ans.push_back(s);
+                return;
+        }
+        if (s[sz(s) - 1] == 'S'){ 
+                func(s + "R");
+        }
+        else{
+                func(s + "S");
+                func(s + "R");
         }
 }
 
 void solve()
 {
-        cin >> n >> m;
-        lis.assign(n, vector<int>());
-        visited.assign(n, 0);
-        height.assign(n, 0);
-        int x, y;
-        for(int i = 0; i < m; i++){
-                cin >> x >> y;
-                lis[x - 1].push_back(y - 1);
-        }
-        for(int i = 0; i < n; i++){
-                if (!(visited[i])) dfs(i);
-        }
-        cout << *max_element(all(height));
+       cin >> k; 
+       func("");
+       cout << sz(ans) << endl;
+       for(auto s : ans) cout << s << endl;
 }
 
 int32_t main()
